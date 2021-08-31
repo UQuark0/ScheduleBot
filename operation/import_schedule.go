@@ -2,8 +2,8 @@ package operation
 
 import (
 	"errors"
-	"log"
 	"schedulebot/model"
+	"schedulebot/service"
 	"strings"
 	"time"
 )
@@ -19,15 +19,6 @@ var weekdays = []time.Weekday{
 	time.Wednesday,
 	time.Thursday,
 	time.Friday,
-}
-
-var location *time.Location
-func init() {
-	l, err := time.LoadLocation("Europe/Kiev")
-	if err != nil {
-		log.Fatal(err)
-	}
-	location = l
 }
 
 func extractArray(data map[string]interface{}, key string) ([]interface{}, error) {
@@ -103,7 +94,7 @@ func generateDates(array []interface{}, weekday time.Weekday) []time.Time {
 	for _, data := range array {
 		dateStr, ok := data.(string)
 		if ok {
-			date, err := time.ParseInLocation("02.01.2006", dateStr, location)
+			date, err := time.ParseInLocation("02.01.2006", dateStr, service.Location)
 			if err != nil {
 				continue
 			}
@@ -121,11 +112,11 @@ func generateDates(array []interface{}, weekday time.Weekday) []time.Time {
 				continue
 			}
 
-			dateStart, err := time.ParseInLocation("02.01.2006", dateStartStr, location)
+			dateStart, err := time.ParseInLocation("02.01.2006", dateStartStr, service.Location)
 			if err != nil {
 				continue
 			}
-			dateEnd, err := time.ParseInLocation("02.01.2006", dateEndStr, location)
+			dateEnd, err := time.ParseInLocation("02.01.2006", dateEndStr, service.Location)
 			if err != nil {
 				continue
 			}
@@ -236,11 +227,11 @@ func ImportSchedule(scheduleData map[string]interface{}, groupId int64) ([]model
 			return nil, err
 		}
 
-		start, err := time.ParseInLocation("15:04", startStr, location)
+		start, err := time.ParseInLocation("15:04", startStr, service.Location)
 		if err != nil {
 			return nil, err
 		}
-		end, err := time.ParseInLocation("15:04", endStr, location)
+		end, err := time.ParseInLocation("15:04", endStr, service.Location)
 		if err != nil {
 			return nil, err
 		}
@@ -320,7 +311,7 @@ func ImportSchedule(scheduleData map[string]interface{}, groupId int64) ([]model
 					Subject:   subjects[subjectIndex].(*model.Subject),
 					Room:      rooms[roomIndex].(*model.Room),
 					Teacher:   teachers[teacherIndex].(*model.Teacher),
-					Slot:      &slots[slotIndex],
+					Slot:      &slots[slotIndex-1],
 					Group:     group,
 					Date:      date,
 				})

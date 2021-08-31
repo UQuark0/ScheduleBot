@@ -22,8 +22,7 @@ func main() {
 	schedule := flag.String("schedule", "", "schedule JSON file")
 	group := flag.Int64("group", 0, "group id")
 	clean := flag.Bool("clean", false, "clean group's schedule")
-	//token := flag.String("token", "", "telegram bot API token")
-	//chat := flag.Int64("chat", 0, "telegram chat id")
+	token := flag.String("token", "", "telegram bot API token")
 
 	flag.Parse()
 
@@ -104,10 +103,12 @@ func main() {
 		}
 	}
 
-	bot, err := bot.NewBot("1292527443:AAEbZeT9LuXeXQcFtloDH35xmDWtFiqV1Vw", 0, db)
-	if err != nil {
-		log.Fatal(err)
-	}
+	if *token != "" {
+		_, err := bot.NewBot(*token, 0, db)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	bot.CheckClasses()
+		select {}
+	}
 }

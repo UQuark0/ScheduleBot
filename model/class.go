@@ -11,4 +11,5 @@ type Class struct {
 	Teacher *Teacher `orm:"rel(fk)"`
 	Slot *Slot `orm:"rel(fk)"`
 	Date time.Time `orm:"type(date)"`
+	Announced bool
 }
