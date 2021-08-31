@@ -23,6 +23,7 @@ func main() {
 	group := flag.Int64("group", 0, "group id")
 	clean := flag.Bool("clean", false, "clean group's schedule")
 	token := flag.String("token", "", "telegram bot API token")
+	channel := flag.String("channel", "", "public channel tag to gather chat id")
 
 	flag.Parse()
 
@@ -104,9 +105,18 @@ func main() {
 	}
 
 	if *token != "" {
-		_, err := bot.NewBot(*token, 0, db)
+		b, err := bot.NewBot(*token, 0, db)
 		if err != nil {
 			log.Fatal(err)
+		}
+
+		if *channel != "" {
+			chatId, err := b.GatherChatId(*channel)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Printf("Chat ID: %d", chatId)
+			return
 		}
 
 		select {}

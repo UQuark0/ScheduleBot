@@ -36,21 +36,6 @@ func NewBot(token string, chatId int64, db orm.Ormer) (*Bot, error) {
 		db: db,
 	}
 
-	scheduler := gocron.NewScheduler(service.Location)
-
-	_, err = scheduler.Every(1).Minute().Do(func() {
-		err := bot.CheckReports()
-		if err != nil {
-			log.Print(err)
-		}
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	scheduler.StartAsync()
-
 	return &bot, nil
 }
 
@@ -130,4 +115,31 @@ func (b *Bot) LoadReports() ([]model.ClassReport, error) {
 	_, err := b.db.Raw(query).QueryRows(&reports)
 
 	return reports, err
+}
+
+func (b *Bot) RunAnnounceMode() error {
+	scheduler := gocron.NewScheduler(service.Location)
+
+	_, err := scheduler.Every(1).Minute().Do(func() {
+		err := b.CheckReports()
+		if err != nil {
+			log.Print(err)
+		}
+	})
+
+	if err != nil {
+		return err
+	}
+
+	scheduler.StartAsync()
+
+	return nil
+}
+
+func (b *Bot) GatherChatId(tag string) (int64, error) {
+	message, err := b.api.Send(tgbotapi.NewMessageToChannel(tag, "test"))
+	if err != nil {
+		return 0, err
+	}
+	return message.Chat.ID, nil
 }
