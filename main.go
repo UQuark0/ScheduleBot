@@ -119,6 +119,11 @@ func main() {
 			return
 		}
 
+		err = b.RunAnnounceMode()
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		select {}
 	}
 }
